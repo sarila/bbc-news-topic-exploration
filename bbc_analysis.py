@@ -197,7 +197,7 @@ doc_term_matrix = vectorizer.fit_transform(documents)
 print(f"✓ Document-term matrix created: {doc_term_matrix.shape}")
 
 # Train LDA model
-n_topics = 5  # You can adjust this number
+n_topics = 10  # You can adjust this number
 print(f"\nTraining LDA model with {n_topics} topics...")
 
 lda_model = LatentDirichletAllocation(
