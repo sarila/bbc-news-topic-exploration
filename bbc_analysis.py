@@ -177,11 +177,12 @@ def plot_coherence_scores(topic_numbers, coherence_scores, optimal_topics):
     plt.legend(fontsize=11)
     plt.xticks(topic_numbers)
     plt.tight_layout()
-    plt.savefig('coherence_scores.png', dpi=300, bbox_inches='tight')
-    print(" Coherence scores plot saved as 'coherence_scores.png'")
+    plt.savefig('coherence_scores_lsa_summary.png', dpi=300, bbox_inches='tight')
+    print(" Coherence scores plot saved as 'coherence_scores_lsa_summary.png'")
     plt.show()
 
 def main():
+    """Main execution function"""
     # Load spaCy model
     global nlp
     nlp = load_spacy_model()
@@ -207,9 +208,9 @@ def main():
     print("STEP 2: Data Cleaning and Tokenization")
     
     # Text column changes depending on the content.
-    text_column = 'text'
+    # text_column = 'text'
     # text_column = 'text_rank_summary'
-    # text_column = 'lsa_summary'
+    text_column = 'lsa_summary'
     
     print(f"\nUsing column: '{text_column}'")
     
@@ -261,8 +262,8 @@ def main():
     plt.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig('zipfs_law_plot.png', dpi=300, bbox_inches='tight')
-    print("\n Zipf's Law plots saved as 'zipfs_law_plot.png'")
+    plt.savefig('zipfs_law_plot_lsa_summary.png', dpi=300, bbox_inches='tight')
+    print("\n Zipf's Law plots saved as 'zipfs_law_plot_lsa_summary.png'")
     plt.show()
     
     # =============================================================================
@@ -362,8 +363,8 @@ def main():
         }
         for data in topics_data
     ])
-    topics_df.to_csv('lda_topics.csv', index=False)
-    print("\n Topics saved to 'lda_topics.csv'")
+    topics_df.to_csv('lda_topics_lsa_summary.csv', index=False)
+    print("\n Topics saved to 'lda_topics_lsa_summary.csv'")
 
     # Assign dominant topic to each document
     dominant_topics = np.argmax(lda_output, axis=1)
@@ -371,20 +372,24 @@ def main():
     
     # Topic distribution visualization
     plt.figure(figsize=(10, 6))
+    # Count documents per topic and ensure an entry for every topic index
     topic_counts = pd.Series(dominant_topics).value_counts().sort_index()
-    plt.bar(range(n_topics), topic_counts, color='steelblue', alpha=0.7, edgecolor='black')
+    # Reindex so that we have a count for every topic index (fill missing with 0)
+    topic_counts = topic_counts.reindex(range(n_topics), fill_value=0)
+    x_vals = list(range(n_topics))
+    plt.bar(x_vals, topic_counts.values, color='steelblue', alpha=0.7, edgecolor='black')
     plt.xlabel('Topic Number', fontsize=12)
     plt.ylabel('Number of Documents', fontsize=12)
     plt.title('Distribution of Documents Across Topics', fontsize=14, fontweight='bold')
-    plt.xticks(range(n_topics), [f'Topic {i+1}' for i in range(n_topics)])
+    plt.xticks(x_vals, [f'Topic {i+1}' for i in x_vals], rotation=45, ha='right')
     plt.grid(axis='y', alpha=0.3)
     plt.tight_layout()
-    plt.savefig('topic_distribution.png', dpi=300, bbox_inches='tight')
-    print(" Topic distribution plot saved as 'topic_distribution.png'")
+    plt.savefig('topic_distribution_lsa_summary.png', dpi=300, bbox_inches='tight')
+    print(" Topic distribution plot saved as 'topic_distribution_lsa_summary.png'")
     plt.show()
     
     # Heatmap of topic-word relationships
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(24, 18))
     top_n_words_heatmap = 15
     top_word_indices = []
     for topic in lda_model.components_:
@@ -402,26 +407,26 @@ def main():
     plt.title('Topic-Word Relationship Heatmap', fontsize=14, fontweight='bold')
     plt.xlabel('Words', fontsize=12)
     plt.ylabel('Topics', fontsize=12)
-    plt.xticks(rotation=100, ha='right')
+    plt.xticks(rotation=45, ha='right', fontsize=9)
     plt.tight_layout()
-    plt.savefig('topic_word_heatmap.png', dpi=300, bbox_inches='tight')
-    print(" Topic-word heatmap saved as 'topic_word_heatmap.png'")
+    plt.savefig('topic_word_heatmap_lsa_summary.png', dpi=300, bbox_inches='tight')
+    print(" Topic-word heatmap saved as 'topic_word_heatmap_lsa_summary.png'")
     plt.show()
     
     # Save processed data
-    df.to_csv('bbc_articles_processed.csv', index=False)
-    print("\n Processed data saved as 'bbc_articles_processed.csv'")
+    df.to_csv('bbc_articles_processed_lsa_summary.csv', index=False)
+    print("\n Processed data saved as 'bbc_articles_processed_lsa_summary.csv'")
     
     print("\n" + "="*70)
     print("ANALYSIS COMPLETE!")
     print("="*70)
     print("\nGenerated files:")
-    print("  1. zipfs_law_plot.png - Visualization of Zipf's law")
-    print("  2. coherence_scores.png - Coherence scores for different topic counts")
-    print("  3. lda_topics.csv - LDA topics with top words")
-    print("  4. topic_distribution.png - Distribution of documents across topics")
-    print("  5. topic_word_heatmap.png - Heatmap showing topic-word relationships")
-    print("  6. bbc_articles_processed.csv - Processed dataset with topic assignments")
+    print("  1. zipfs_law_plot_lsa_summary.png - Visualization of Zipf's law")
+    print("  2. coherence_scores_lsa_summary.png - Coherence scores for different topic counts")
+    print("  3. lda_topics_lsa_summary.csv - LDA topics with top words")
+    print("  4. topic_distribution_lsa_summary.png - Distribution of documents across topics")
+    print("  5. topic_word_heatmap_lsa_summary.png - Heatmap showing topic-word relationships")
+    print("  6. bbc_articles_processed_lsa_summary.csv - Processed dataset with topic assignments")
 
 if __name__ == '__main__':
     main()
