@@ -36,7 +36,7 @@ def load_spacy_model():
         print("Loading spaCy model...")
         try:
             nlp = spacy.load("en_core_web_sm")
-            print("✓ spaCy model loaded successfully!")
+            print(" spaCy model loaded successfully!")
         except OSError:
             print("ERROR: spaCy model 'en_core_web_sm' not found!")
             print("Please install it using: python -m spacy download en_core_web_sm")
@@ -103,21 +103,7 @@ def clean_text(text):
     
     return cleaned_tokens
 
-def calculate_coherence_scores(documents, topic_range=range(30, 100)):
-    """
-    Calculate coherence scores for different numbers of topics.
-    
-    Parameters:
-    -----------
-    documents : list of str
-        Preprocessed documents (tokens joined as strings)
-    topic_range : range or list, optional
-        Range of topic numbers to test (default: 30 to 100)
-
-    Returns:
-    --------
-    dict : Contains topic numbers, coherence scores, and the best model
-    """
+def calculate_coherence_scores(documents, topic_range=range(30, 50)):
     # Prepare documents as list of token lists for gensim
     tokenized_docs = [doc.split() for doc in documents if doc.strip()]
     
@@ -165,7 +151,7 @@ def calculate_coherence_scores(documents, topic_range=range(30, 100)):
     optimal_topics = list(topic_range)[optimal_idx]
     optimal_score = coherence_scores[optimal_idx]
     
-    print(f"\n✓ Optimal number of topics: {optimal_topics} (coherence: {optimal_score:.4f})")
+    print(f"\n Optimal number of topics: {optimal_topics} (coherence: {optimal_score:.4f})")
     
     return {
         'topic_numbers': list(topic_range),
@@ -192,33 +178,16 @@ def plot_coherence_scores(topic_numbers, coherence_scores, optimal_topics):
     plt.xticks(topic_numbers)
     plt.tight_layout()
     plt.savefig('coherence_scores.png', dpi=300, bbox_inches='tight')
-    print("✓ Coherence scores plot saved as 'coherence_scores.png'")
+    print(" Coherence scores plot saved as 'coherence_scores.png'")
     plt.show()
 
 def main():
-    """Main execution function"""
     # Load spaCy model
     global nlp
     nlp = load_spacy_model()
     
-    # =============================================================================
     # STEP 1: Load the data from Kaggle
-    # =============================================================================
-    print("\n" + "="*70)
     print("STEP 1: Loading Data")
-    print("="*70)
-    
-    # Note: You need to download the dataset from Kaggle first
-    # Method 1: Download manually from https://www.kaggle.com/datasets/jacopoferretti/bbc-articles-dataset
-    # Method 2: Use Kaggle API (requires kaggle.json credentials)
-    # 
-    # To use Kaggle API:
-    # 1. Install kaggle: pip install kaggle
-    # 2. Get your API token from kaggle.com/account
-    # 3. Place kaggle.json in ~/.kaggle/
-    # 4. Run: kaggle datasets download -d jacopoferretti/bbc-articles-dataset
-    
-    # For now, we'll assume you've downloaded the CSV file
     try:
         # Try to load the dataset (update the path to where you saved it)
         df = pd.read_csv('bbc-news-data.csv')
@@ -234,24 +203,13 @@ def main():
         print("and save it as 'bbc-news-data.csv' in the same directory.")
         exit()
     
-    # =============================================================================
     # STEP 2: Data Cleaning with Tokenization and Removing Common Words
-    # =============================================================================
-    print("\n" + "="*70)
     print("STEP 2: Data Cleaning and Tokenization")
-    print("="*70)
     
-    # Identify the text column (usually 'content', 'text', or 'article')
-    # text_column = 'text'
+    # Text column changes depending on the content.
     text_column = 'text'
-    # for col in ['content', 'text', 'article', 'description']:
-    #     if col in df.columns:
-    #         text_column = col
-    #         break
-    
-    # if text_column is None:
-    #     print("Available columns:", df.columns.tolist())
-    #     text_column = input("Enter the name of the column containing article text: ")
+    # text_column = 'text_rank_summary'
+    # text_column = 'lsa_summary'
     
     print(f"\nUsing column: '{text_column}'")
     
@@ -264,34 +222,27 @@ def main():
     for tokens in df['cleaned_tokens']:
         all_tokens.extend(tokens)
     
-    print(f"✓ Cleaning complete!")
+    print(f" Cleaning complete!")
     print(f"  - Total tokens after cleaning: {len(all_tokens)}")
     print(f"  - Unique words: {len(set(all_tokens))}")
     
-    # =============================================================================
     # STEP 3: Implement Zipf's Law (Rank vs Frequency)
-    # =============================================================================
-    print("\n" + "="*70)
-    print("STEP 3: Zipf's Law Analysis")
-    print("="*70)
-    
-    # Count word frequencies
+    print("STEP 3: Zipf's Law Analysis")    
     word_freq = Counter(all_tokens)
-    
-    # Get words and their frequencies, sorted by frequency (descending)
     words_sorted = word_freq.most_common()
     
     # Prepare data for plotting
     ranks = list(range(1, len(words_sorted) + 1))
     frequencies = [freq for word, freq in words_sorted]
     
-    print(f"✓ Word frequency analysis complete!")
+    print(f" Word frequency analysis complete!")
     print(f"\nTop 10 most frequent words:")
     for i, (word, freq) in enumerate(words_sorted[:10], 1):
         print(f"  {i}. '{word}': {freq} occurrences")
     
     # Create Zipf's Law plot
     plt.figure(figsize=(14, 5))
+    
     
     # Plot 1: Linear scale
     plt.subplot(1, 2, 1)
@@ -311,7 +262,7 @@ def main():
     
     plt.tight_layout()
     plt.savefig('zipfs_law_plot.png', dpi=300, bbox_inches='tight')
-    print("\n✓ Zipf's Law plots saved as 'zipfs_law_plot.png'")
+    print("\n Zipf's Law plots saved as 'zipfs_law_plot.png'")
     plt.show()
     
     # =============================================================================
@@ -332,7 +283,7 @@ def main():
     # Calculate coherence scores for different numbers of topics
     coherence_results = calculate_coherence_scores(
         documents=documents,
-        topic_range=range(30, 100)  # Test 30-100 topics
+        topic_range=range(30, 50)  # Test 30-50 topics
     )
     
     # Plot results
@@ -344,15 +295,9 @@ def main():
     
     # Use optimal number of topics for LDA
     n_topics = coherence_results['optimal_topics']
-    print(f"\n✓ Using {n_topics} topics for LDA model (based on coherence score)")
+    print(f"\n Using {n_topics} topics for LDA model (based on coherence score)")
     
-    # =============================================================================
-    # STEP 4: Topic Modeling using LDA
-    # =============================================================================
-    print("\n" + "="*70)
     print("STEP 4: Topic Modeling with LDA")
-    print("="*70)
-    
     print(f"Processing {len(documents)} documents for topic modeling...")
     
     # Create document-term matrix
@@ -363,7 +308,7 @@ def main():
     )
     
     doc_term_matrix = vectorizer.fit_transform(documents)
-    print(f"✓ Document-term matrix created: {doc_term_matrix.shape}")
+    print(f" Document-term matrix created: {doc_term_matrix.shape}")
     
     # Train LDA model (n_topics already determined by coherence score)
     print(f"\nTraining LDA model with {n_topics} topics...")
@@ -377,7 +322,7 @@ def main():
     )
     
     lda_output = lda_model.fit_transform(doc_term_matrix)
-    print("✓ LDA model trained successfully!")
+    print(" LDA model trained successfully!")
     
     # Get feature names (words)
     feature_names = vectorizer.get_feature_names_out()
@@ -418,7 +363,7 @@ def main():
         for data in topics_data
     ])
     topics_df.to_csv('lda_topics.csv', index=False)
-    print("\n✓ Topics saved to 'lda_topics.csv'")
+    print("\n Topics saved to 'lda_topics.csv'")
 
     # Assign dominant topic to each document
     dominant_topics = np.argmax(lda_output, axis=1)
@@ -435,7 +380,7 @@ def main():
     plt.grid(axis='y', alpha=0.3)
     plt.tight_layout()
     plt.savefig('topic_distribution.png', dpi=300, bbox_inches='tight')
-    print("✓ Topic distribution plot saved as 'topic_distribution.png'")
+    print(" Topic distribution plot saved as 'topic_distribution.png'")
     plt.show()
     
     # Heatmap of topic-word relationships
@@ -460,12 +405,12 @@ def main():
     plt.xticks(rotation=100, ha='right')
     plt.tight_layout()
     plt.savefig('topic_word_heatmap.png', dpi=300, bbox_inches='tight')
-    print("✓ Topic-word heatmap saved as 'topic_word_heatmap.png'")
+    print(" Topic-word heatmap saved as 'topic_word_heatmap.png'")
     plt.show()
     
     # Save processed data
     df.to_csv('bbc_articles_processed.csv', index=False)
-    print("\n✓ Processed data saved as 'bbc_articles_processed.csv'")
+    print("\n Processed data saved as 'bbc_articles_processed.csv'")
     
     print("\n" + "="*70)
     print("ANALYSIS COMPLETE!")
