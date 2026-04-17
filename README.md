@@ -56,6 +56,11 @@ After running the script, you'll get:
 4. **topic_word_heatmap.png** - Heatmap of topic-word relationships
 5. **bbc_articles_processed.csv** - Processed dataset with topic assignments
 
+You can change the text column you are using to either:
+1. 'text' column for original news text
+2. 'text_rank_summary' column for a summary of news using text rank
+3. 'lsa_summary' column for a summary of news using lsa
+
 ## Interpreting Results
 
 See **TOPIC_INTERPRETATION.md** for a comprehensive guide on:
@@ -93,14 +98,8 @@ See **TOPIC_INTERPRETATION.md** for a comprehensive guide on:
 - Run: `python -m spacy download en_core_web_sm`
 - The script will check for the model at startup
 
-## Next Steps
-- Experiment with different numbers of topics
-- Try advanced preprocessing (lemmatization with spaCy, named entity recognition)
-- Compare topics with actual BBC categories
-- Analyze temporal trends if timestamp data is available
-
 ## Author
-Data Science Beginner Project
+Sarila Ngakhusi
 
 ## Dataset Credit
 Dataset from: https://www.kaggle.com/datasets/jacopoferretti/bbc-articles-dataset
