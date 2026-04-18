@@ -1,7 +1,7 @@
-# BBC Articles Data Science Analysis
+# BBC Articles text analysis project
 
 ## Project Overview
-This project analyzes BBC news articles using natural language processing and topic modeling techniques.
+This project analyzes BBC news articles using the LDA topic modeling technique.
 
 ## Steps Performed
 1. **Data Loading**: Load BBC articles dataset from Kaggle
