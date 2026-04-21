@@ -1,12 +1,3 @@
-"""
-BBC Articles Analysis
-This script performs text analysis on BBC articles dataset including:
-- Data loading from Kaggle
-- Text cleaning and tokenization
-- Zipf's law visualization
-- Topic modeling with LDA
-"""
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -43,19 +34,7 @@ def load_spacy_model():
             exit()
     return nlp
 
-# Note: You need to download the dataset from Kaggle first
-# Method 1: Download manually from https://www.kaggle.com/datasets/jacopoferretti/bbc-articles-dataset
-# Method 2: Use Kaggle API (requires kaggle.json credentials)
-# 
-# To use Kaggle API:
-# 1. Install kaggle: pip install kaggle
-# 2. Get your API token from kaggle.com/account
-# 3. Place kaggle.json in ~/.kaggle/
-# 4. Run: kaggle datasets download -d jacopoferretti/bbc-articles-dataset
-
-# For now, we'll assume you've downloaded the CSV file
 try:
-    # Try to load the dataset (update the path to where you saved it)
     df = pd.read_csv('bbc-news-data.csv')
     print(f"Dataset loaded successfully!")
     print(f"  - Shape: {df.shape}")
@@ -69,12 +48,8 @@ except FileNotFoundError:
     print("and save it as 'bbc-news-data.csv' in the same directory.")
     exit()
 
-# =============================================================================
 # STEP 2: Data Cleaning with Tokenization and Removing Common Words
-# =============================================================================
-print("\n" + "="*70)
 print("STEP 2: Data Cleaning and Tokenization")
-print("="*70)
 
 def clean_text(text):
     """
@@ -190,7 +165,7 @@ def main():
     # STEP 1: Load the data from Kaggle
     print("STEP 1: Loading Data")
     try:
-        # Try to load the dataset (update the path to where you saved it)
+        # Try to load the dataset
         df = pd.read_csv('bbc-news-data.csv')
         print(f"Dataset loaded successfully!")
         print(f"  - Shape: {df.shape}")
@@ -266,12 +241,8 @@ def main():
     print("\n Zipf's Law plots saved as 'zipfs_law_plot_main_text.png'")
     plt.show()
     
-    # =============================================================================
     # STEP 3.5: Find Optimal Number of Topics using Coherence Score
-    # =============================================================================
-    print("\n" + "="*70)
     print("STEP 3.5: Finding Optimal Number of Topics")
-    print("="*70)
     
     # Prepare documents (join tokens back into strings)
     documents = [' '.join(tokens) for tokens in df['cleaned_tokens']]
@@ -329,9 +300,7 @@ def main():
     feature_names = vectorizer.get_feature_names_out()
     
     # Display topics
-    print("\n" + "="*70)
     print("DISCOVERED TOPICS")
-    print("="*70)
     
     n_top_words = 10
     topics_data = []
@@ -417,9 +386,7 @@ def main():
     df.to_csv('bbc_articles_processed_main_text.csv', index=False)
     print("\n Processed data saved as 'bbc_articles_processed_main_text.csv'")
     
-    print("\n" + "="*70)
     print("ANALYSIS COMPLETE!")
-    print("="*70)
     print("\nGenerated files:")
     print("  1. zipfs_law_plot_main_text.png - Visualization of Zipf's law")
     print("  2. coherence_scores_main_text.png - Coherence scores for different topic counts")
